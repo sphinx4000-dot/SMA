@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMA Token</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{box-sizing:border-box;}
+body{margin:0;font-family:Arial,sans-serif;background:#0b1220;color:#fff;}
+section{padding:80px 20px;text-align:center}
+h1,h2{margin-bottom:20px}
+p{line-height:1.7;color:#d0d7e2;max-width:900px;margin:auto;}
+
+/* Header */
+.header{display:flex;align-items:center;justify-content:space-between;padding:20px;background:#0b1220;position:relative;}
+.header img{height:60px;transition: transform 0.5s, box-shadow 0.5s;}
+.header img:hover{transform: scale(1.08) rotate(-3deg);box-shadow:0 10px 25px rgba(0,0,0,0.7);}
+
+/* Right Side buttons */
+.header .right{display:flex;align-items:center;gap:15px;}
+.header .site-buttons{display:flex;gap:10px;}
+.header .site-buttons a{padding:10px 18px;border-radius:12px;font-weight:bold;box-shadow:0 4px 15px rgba(0,0,0,.5);transition:.3s;text-decoration:none;}
+.header .site-buttons a:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,.6);}
+.header .btn-website{background:#1e88e5;color:#fff;}
+.header .btn-bsc{background:#f0b90b;color:#000;}
+.header .btn-pancake{background:#ff7043;color:#fff;}
+
+/* Language Buttons */
+.header .lang button{padding:8px 12px;border:none;border-radius:10px;background:#111827;color:#fff;cursor:pointer;font-weight:bold;transition:.3s;}
+.header .lang button:hover{background:#1e88e5;color:#fff;transform:scale(1.05);}
+
+/* Banner */
+.banner{height:90vh;background:url("https://i.ibb.co/gMvwRv57/11.png") center/cover no-repeat;display:flex;align-items:center;justify-content:center;position:relative;}
+.banner::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.65);transition: background 0.5s;}
+.banner:hover::after{background:rgba(0,0,0,.5);}
+.banner-content{position:relative;z-index:2;text-align:center;padding:20px;display:flex;justify-content:space-between;align-items:center;max-width:1100px;width:100%;}
+.banner-left{flex:1;text-align:left;}
+.banner-right{flex:1;text-align:center;}
+
+/* Banner Text Effects */
+.banner-content h1{font-size:52px;transition: transform 0.5s, text-shadow 0.5s;}
+.banner:hover .banner-content h1{transform: scale(1.05);text-shadow:0 0 15px #1e88e5;}
+.banner-content p{transition:text-shadow 0.5s;}
+.banner:hover .banner-content p{text-shadow:0 0 8px #fff;}
+
+/* Buttons */
+.buttons{margin-top:30px;display:flex;justify-content:center;gap:15px;flex-wrap:wrap;}
+.btn{padding:15px 30px;border-radius:14px;font-weight:bold;text-decoration:none;transition:.3s;box-shadow:0 8px 20px rgba(0,0,0,.5);}
+.btn:hover{transform:translateY(-4px);}
+.btn-wallet{background:#7c4dff;color:#fff;border:none;cursor:pointer;}
+.btn-buy{background:#ff7043;color:#fff;border:none;cursor:pointer;}
+
+/* Buy Calculator */
+.buy-calculator{padding:20px;background:#111827;border-radius:18px;max-width:300px;margin:auto;}
+.buy-calculator input, .buy-calculator select{width:100%;padding:12px;border-radius:12px;border:none;margin-bottom:15px;text-align:center;}
+.buy-calculator button{width:100%;padding:12px;border:none;border-radius:12px;background:#ff7043;color:#fff;font-weight:bold;cursor:pointer;}
+.buy-calculator p{margin-top:10px;font-size:16px;color:#fdd835;}
+
+/* Cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-top:40px;}
+.card{background:#111827;padding:25px;border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.4);}
+
+/* Contract Box */
+.contract{background:#0f172a;padding:20px;border-radius:14px;word-break:break-all;margin-top:20px;font-size:14px;}
+
+/* Chart Container */
+#tokenChart{max-width:500px;margin:40px auto 0;}
+
+/* Footer */
+footer{padding:20px;background:#0b1220;color:#90a4ae;text-align:center;}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <img src="https://i.ibb.co/gMvwRv57/11.png" alt="SMA Logo">
+  <div class="right">
+    <!-- Site Buttons -->
+    <div class="site-buttons">
+      <a href="https://sma-token.io" target="_blank" class="btn-website">Website</a>
+      <a href="https://bscscan.com/token/0x63a090c6530F7A190f4f77604FCBF1218273ac24" target="_blank" class="btn-bsc">BscScan</a>
+      <a href="https://pancakeswap.finance/swap?outputCurrency=0x63a090c6530F7A190f4f77604FCBF1218273ac24&chain=bsc" target="_blank" class="btn-pancake">PancakeSwap</a>
+    </div>
+    <!-- Language Buttons -->
+    <div class="lang">
+      <button onclick="setLang('en')">EN</button>
+      <button onclick="setLang('fr')">FR</button>
+    </div>
+  </div>
+</div>
+
+<!-- Banner -->
+<div class="banner">
+  <div class="banner-content">
+    <!-- Left: Calculator -->
+    <div class="banner-left">
+      <div class="buy-calculator">
+        <h2>Buy SMA</h2>
+        <input type="number" id="amountInput" placeholder="Enter BNB or USDT amount" step="0.0001">
+        <select id="currencySelect">
+          <option value="bnb">BNB</option>
+          <option value="usdt">USDT</option>
+        </select>
+        <button onclick="calculateSMA()">💰 Calculate SMA</button>
+        <p id="smaOutput">You will get 0 SMA</p>
+        <p id="feeOutput"></p>
+        <p id="impactOutput"></p>
+        <p id="riskOutput" style="color:#ff5252;font-weight:bold;"></p>
+        <button id="btnBuySMA" class="btn-buy" style="display:none;" onclick="buySMA()">✅ Buy SMA Now</button>
+      </div>
+    </div>
+    <!-- Right: Banner Text -->
+    <div class="banner-right">
+      <h1 id="title">SMA TOKEN</h1>
+      <p id="desc">SMA Token is a community-driven digital asset built on Binance Smart Chain (BSC), designed for gaming, rewards, and interactive platforms.</p>
+      <div class="buttons">
+        <button class="btn-wallet" onclick="connectWallet()">🦊 Connect Wallet</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- About -->
+<section>
+<h2 id="aboutTitle">About SMA Token</h2>
+<p id="aboutText">SMA Token focuses on transparency, low fees, and long-term growth, offering fast transactions and seamless integration with dApps.</p>
+<div class="contract"><b>Contract Address:</b><br>0x63a090c6530F7A190f4f77604FCBF1218273ac24</div>
+</section>
+
+<!-- Tokenomics -->
+<section style="background:#111827">
+<h2 id="tokenTitle">Tokenomics</h2>
+<canvas id="tokenChart"></canvas>
+<div class="cards">
+  <div class="card">💰 Total Supply<br><b>5,000,000,000 SMA</b></div>
+  <div class="card">📦 Circulating Supply<br><b>4,995,269,927.84 SMA</b></div>
+  <div class="card">🔒 Liquidity<br><b>Locked 100% (1 Year)</b></div>
+  <div class="card">👨‍💻 Team Tokens<br><b>Locked</b></div>
+  <div class="card">🎮 Gaming & Rewards<br><b>40%</b></div>
+  <div class="card">🌍 Community & Marketing<br><b>25%</b></div>
+</div>
+</section>
+
+<!-- Roadmap -->
+<section>
+<h2 id="roadmapTitle">Roadmap</h2>
+<div class="cards">
+  <div class="card">🚀 Phase 1<br>Launch & Liquidity Lock</div>
+  <div class="card">🎮 Phase 2<br>Games & Rewards</div>
+  <div class="card">📈 Phase 3<br>Listings & Marketing</div>
+  <div class="card">🌐 Phase 4<br>Expansion & Partnerships</div>
+</div>
+</section>
+
+<footer>
+Powered By BNB Smart Chain<br>
+© 2026 SMA Token — All Rights Reserved
+</footer>
+
+<script>
+// Language
+const content = {
+  en:{title:"SMA TOKEN",desc:"SMA Token is a community-driven digital asset built on Binance Smart Chain (BSC), designed for gaming, rewards, and interactive platforms.",aboutTitle:"About SMA Token",aboutText:"SMA Token focuses on transparency, low fees, and long-term growth, offering fast transactions and seamless integration with dApps.",tokenTitle:"Tokenomics",roadmapTitle:"Roadmap"},
+  fr:{title:"SMA TOKEN",desc:"SMA Token est un actif numérique communautaire construit sur Binance Smart Chain (BSC), conçu pour les jeux, les récompenses et les plateformes interactives.",aboutTitle:"À propos de SMA Token",aboutText:"SMA Token se concentre sur la transparence, les faibles frais et la croissance à long terme, offrant des transactions rapides et une intégration transparente avec les applications décentralisées (dApps).",tokenTitle:"Tokenomics",roadmapTitle:"Feuille de route"}
+}
+function setLang(lang){for(const id in content[lang])document.getElementById(id).innerText=content[lang][id];}
+
+// Wallet
+async function connectWallet(){if(window.ethereum){await ethereum.request({method:'eth_requestAccounts'});alert("Wallet Connected ✔");}else{alert("Please install MetaMask");}}
+
+// Live SMA Price
+let smaPriceBNB=0;
+async function fetchSMAPrice(){
+  try{
+    const query=`{pair(id:"0xe9e7cea3dedca5984780bafc599bd69add087d56"){token0Price}}`;
+    const res=await fetch("https://api.thegraph.com/subgraphs/name/pancakeswap/exchange-v2",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({query})});
+    const data=await res.json();
+    smaPriceBNB=parseFloat(data.data.pair.token0Price);
+  }catch(e){console.error("Error SMA price",e);}
+}
+fetchSMAPrice();setInterval(fetchSMAPrice,20000);
+
+// Buy Calculator
+let tradingFeeBNB=0.000025,priceImpactPercent=4.48,slippagePercent=0.5;
+function calculateSMA(){
+  const amount=parseFloat(document.getElementById("amountInput").value);
+  const currency=document.getElementById("currencySelect").value;
+  if(isNaN(amount)||amount<=0){document.getElementById("smaOutput").innerText="Enter valid amount";return;}
+  let price=(currency==="bnb")?smaPriceBNB: smaPriceBNB*400;
+  const smaAmount=amount/price;
+  document.getElementById("smaOutput").innerText=`You will get ~${Math.floor(smaAmount).toLocaleString()} SMA`;
+  document.getElementById("feeOutput").innerText=`Estimated Trading Fee: ${tradingFeeBNB} BNB`;
+  document.getElementById("impactOutput").innerText=`Price Impact: ${priceImpactPercent}% | Slippage: ${slippagePercent}%`;
+  document.getElementById("riskOutput").innerText=`Medium Risk detected for SMA`;
+  document.getElementById("btnBuySMA").style.display="inline-block";
+}
+function buySMA(){
+  const amount=parseFloat(document.getElementById("amountInput").value);
+  const currency=document.getElementById("currencySelect").value;
+  let url="";
+  if(currency==="bnb"){url=`https://pancakeswap.finance/swap?outputCurrency=0x63a090c6530F7A190f4f77604FCBF1218273ac24&exactAmount=${amount}&chain=bsc`;}
+  else{url=`https://pancakeswap.finance/swap?inputCurrency=0x55d398326f99059ff775485246999027b3197955&outputCurrency=0x63a090c6530F7A190f4f77604FCBF1218273ac24&exactAmount=${amount}&chain=bsc`;}
+  window.open(url,'_blank');
+}
+
+// Tokenomics Chart
+const ctx=document.getElementById('tokenChart').getContext('2d');
+new Chart(ctx,{type:'pie',data:{labels:['Liquidity','Gaming & Rewards','Community & Marketing','Team Tokens','Development'],datasets:[{data:[20,40,25,10,5],backgroundColor:['#1e88e5','#ff7043','#4caf50','#7c4dff','#fdd835'],borderColor:'#0b1220',borderWidth:2}]}});
+
+</script>
+</body>
+</html>
